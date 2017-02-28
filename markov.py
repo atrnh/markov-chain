@@ -49,8 +49,15 @@ def make_text(chains):
     """Takes dictionary of markov chains; returns random text."""
 
     text = ""
+    current_link = choice(chains.keys())
+    text += current_link[0] + ' ' + current_link[1]
 
-    # your code goes here
+    while current_link in chains:
+        next_word = choice(chains[current_link])
+        current_link = (current_link[1], next_word)
+
+        if current_link in chains:
+            text += ' ' + next_word
 
     return text
 
@@ -63,7 +70,7 @@ input_text = open_and_read_file(input_path)
 # Get a Markov chain
 chains = make_chains(input_text)
 
-# # Produce random text
-# random_text = make_text(chains)
+# Produce random text
+random_text = make_text(chains)
 
-# print random_text
+print random_text
