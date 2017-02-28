@@ -8,13 +8,7 @@ def open_and_read_file(file_path):
     the file's contents as one string of text.
     """
 
-    lines = open(file_path)
-    text = ''
-
-    for line in lines:
-        text += line.rstrip() + ' '
-
-    return text
+    return open(file_path).read()
 
 
 def make_chains(text_string):
@@ -32,7 +26,21 @@ def make_chains(text_string):
 
     chains = {}
 
-    # your code goes here
+    words = text_string.split() 
+
+    for i in range(len(words) - 1):
+        first_word = words[i]
+
+        # Wrap around back to the beginning of the list if the
+        # index does not exist
+        sec_word = words[(i + 1) % len(words)]
+
+        # Find word that follows sec_word
+        next_word = words[(i + 2) % len(words)]
+
+        bigram = (first_word, sec_word)
+        chains[bigram] = chains.get(bigram, [])
+        chains[bigram].append(next_word)
 
     return chains
 
@@ -51,10 +59,9 @@ input_path = "green-eggs.txt"
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
-print input_text
 
-# # Get a Markov chain
-# chains = make_chains(input_text)
+# Get a Markov chain
+chains = make_chains(input_text)
 
 # # Produce random text
 # random_text = make_text(chains)
