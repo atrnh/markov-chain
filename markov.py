@@ -117,7 +117,7 @@ def make_tweet():
         if is_under_140(test_tweet):
             tweet = test_tweet
         else:
-            return tweet
+            return tweet[:-1]
 
 
 # Produce random text
