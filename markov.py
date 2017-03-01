@@ -1,5 +1,6 @@
 from random import choice
 import sys
+import string
 
 
 def open_and_read_file(file_path):
@@ -27,17 +28,19 @@ def make_chains(text_string, n=2):
         {('hi', 'there'): ['mary', 'juanita'], ('there', 'mary'): ['hi'], ('mary', 'hi': ['there']}
     """
 
+    # Remember n is the length of our n-gram!!
     chains = {}
 
     words = text_string.split()
 
+    # Populate our n-gram
     for i in range(len(words) - (n - 1)):
         ngram = []
 
         for incr in range(0, n):
             ngram.append(words[i + incr])
 
-        # Find word that follows sec_word
+        # Find the word that follows the last member of our ngram
         try:
             next_word = words[i + n]
         except IndexError:
@@ -50,25 +53,35 @@ def make_chains(text_string, n=2):
     return chains
 
 
-def make_text(chains, n=2):
-    """Takes dictionary of markov chains; returns random text."""
+def make_text(chains):
+    """Takes dictionary of markov chains; returns a random sentence."""
+
+    ending_punctuation = '.?!'
 
     text = ""
-    current_link = choice(chains.keys())
+    # Start only on a capital letter
+    current_link = choice([key for key in chains.keys() if key[0][0] == key[0][0].upper()
+                                                           and key[0][0] not in string.punctuation])
+    n = len(current_link) # the length of our n-gram
     text += ' '.join(current_link)
 
     while True:
         next_word = choice(chains[current_link])
         next_link = []
 
+        # Populate the next link in our chain
         for incr in range(0, n - 1):
             next_link.append(current_link[1 + incr])
 
-        next_link.append(next_word)
-
         if next_word is None:
-            break
+            break # There are no more words left
+        elif next_word[-1] in ending_punctuation:
+            next_link.append(next_word)
+            current_link = tuple(next_link)
+            text += ' ' + next_word
+            break # The sentence has ended
         else:
+            next_link.append(next_word)
             current_link = tuple(next_link)
             text += ' ' + next_word
 
@@ -84,6 +97,6 @@ input_text = open_and_read_file(input_path)
 chains = make_chains(input_text, 3)
 
 # Produce random text
-random_text = make_text(chains, 3)
+random_text = make_text(chains)
 
 print random_text
