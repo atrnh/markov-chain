@@ -113,6 +113,7 @@ def make_tweet():
 
     while True:
         test_tweet = tweet + make_text(chains) + ' '
+
         if is_under_140(test_tweet):
             tweet = test_tweet
         else:
