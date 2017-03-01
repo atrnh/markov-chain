@@ -53,17 +53,21 @@ def make_chains(text_string, n=2):
     return chains
 
 
-def make_sentence(chains):
+def make_sentence(chains, seed_link=None):
     """Takes dictionary of Markov chains; returns a random sentence."""
 
     ending_punctuation = '.?!'
 
     sentence = ''
-    # Start only on a capital letter
-    current_link = choice(chains.keys())
-    while (current_link[0][0] != current_link[0][0].upper()
-           or current_link[0][0] in string.punctuation):
+
+    if seed_link is None:
+        # Start only on a capital letter
         current_link = choice(chains.keys())
+        while (current_link[0][0] != current_link[0][0].upper()
+               or current_link[0][0] in string.punctuation):
+            current_link = choice(chains.keys())
+    else:
+        current_link = seed_link
 
     n = len(current_link)  # the length of our n-gram
     sentence += ' '.join(current_link)
@@ -94,9 +98,18 @@ def make_sentence(chains):
 
 def make_next_sentence(sentence, chains):
     """Returns a sentence based on the last n-gram of the previous sentence."""
-    n = len(chains.iteritems()[0][0])
-    sentence = sentence.split()
-    current_link = tuple(sentence[(-1 * n):])
+
+    n = len(chains.keys()[0])
+    words = sentence.split()
+
+    # Check to see if it's even possible to make a next sentence
+    if tuple(words[(-1 * n):]) in chains:
+        seed_link = tuple(words[(-1 * n):])
+        return make_sentence(chains, seed_link)
+        # TO DO:
+        # Currently prints the seed_link as well as the new sentence
+    else:
+        return None
 
 
 def make_next_link(link, word):
@@ -138,7 +151,14 @@ def make_tweet():
 
 
 # Produce random text
-tweet = make_tweet()
+# tweet = make_tweet()
 
-print tweet
-print len(tweet)
+# print tweet
+# print len(tweet)
+
+input_path = sys.argv[1]
+# Open the file and turn it into one long string
+input_text = open_and_read_file(input_path)
+# Get a Markov chain
+chains = make_chains(input_text, 2)
+print make_next_sentence('Would you could you with a fox?', chains)
