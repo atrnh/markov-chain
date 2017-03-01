@@ -78,16 +78,27 @@ def make_text(chains):
         if next_word is None:
             break # There are no more words left
         elif next_word[-1] in ending_punctuation:
-            next_link.append(next_word)
-            current_link = tuple(next_link)
+            current_link = make_next_link(next_link, next_word)
             text += ' ' + next_word
             break # The sentence has ended
         else:
-            next_link.append(next_word)
-            current_link = tuple(next_link)
+            current_link = make_next_link(next_link, next_word)
             text += ' ' + next_word
 
     return text
+
+
+def make_next_link(link, word):
+    """Returns the next link as a tuple"""
+
+    link.append(word)
+    return tuple(link)
+
+
+def is_over_140(text):
+    """Returns true if text is over 140 characters."""
+
+    return len(text) > 140
 
 
 input_path = sys.argv[1]
@@ -102,3 +113,5 @@ chains = make_chains(input_text, 3)
 random_text = make_text(chains)
 
 print random_text
+
+print is_over_140(random_text)
