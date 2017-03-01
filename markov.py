@@ -89,29 +89,38 @@ def make_text(chains):
 
 
 def make_next_link(link, word):
-    """Returns the next link as a tuple"""
+    """Returns the next link as a tuple."""
 
     link.append(word)
     return tuple(link)
 
 
-def is_over_140(text):
-    """Returns true if text is over 140 characters."""
+def is_under_140(text):
+    """Returns true if text is less than or equal to 140 characters."""
 
-    return len(text) > 140
+    return len(text) < 140
 
 
-input_path = sys.argv[1]
+def make_tweet():
+    """Returns a Markov tweet."""
 
-# Open the file and turn it into one long string
-input_text = open_and_read_file(input_path)
+    input_path = sys.argv[1]
+    # Open the file and turn it into one long string
+    input_text = open_and_read_file(input_path)
+    # Get a Markov chain
+    chains = make_chains(input_text, 3)
+    tweet = ''
 
-# Get a Markov chain
-chains = make_chains(input_text, 3)
+    while True:
+        test_tweet = tweet + make_text(chains) + ' '
+        if is_under_140(test_tweet):
+            tweet = test_tweet
+        else:
+            return tweet
+
 
 # Produce random text
-random_text = make_text(chains)
+tweet = make_tweet()
 
-print random_text
-
-print is_over_140(random_text)
+print tweet
+print len(tweet)
