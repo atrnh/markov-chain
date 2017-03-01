@@ -11,7 +11,7 @@ def open_and_read_file(file_path):
     return open(file_path).read()
 
 
-def make_chains(text_string):
+def make_chains(text_string, n=2):
     """Takes input text as string; returns _dictionary_ of markov chains.
 
     A chain will be a key that consists of a tuple of (word1, word2)
@@ -26,24 +26,23 @@ def make_chains(text_string):
 
     chains = {}
 
-    words = text_string.split() 
+    words = text_string.split()
 
-    for i in range(len(words) - 1):
-        first_word = words[i]
+    for i in range(len(words) - (n - 1)):
+        ngram = []
 
-        # Wrap around back to the beginning of the list if the
-        # index does not exist
-        sec_word = words[i + 1]
+        for incr in range(0,n):
+            ngram.append(words[i + incr])
 
         # Find word that follows sec_word
         try:
-            next_word = words[i + 2]
+            next_word = words[i + n]
         except IndexError:
             next_word = None
 
-        bigram = (first_word, sec_word)
-        chains[bigram] = chains.get(bigram, [])
-        chains[bigram].append(next_word)
+        ngram = tuple(ngram)
+        chains[ngram] = chains.get(ngram, [])
+        chains[ngram].append(next_word)
 
     return chains
 
