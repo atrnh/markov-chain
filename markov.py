@@ -33,10 +33,13 @@ def make_chains(text_string):
 
         # Wrap around back to the beginning of the list if the
         # index does not exist
-        sec_word = words[(i + 1) % len(words)]
+        sec_word = words[i + 1]
 
         # Find word that follows sec_word
-        next_word = words[(i + 2) % len(words)]
+        try:
+            next_word = words[i + 2]
+        except IndexError:
+            next_word = None
 
         bigram = (first_word, sec_word)
         chains[bigram] = chains.get(bigram, [])
@@ -52,11 +55,13 @@ def make_text(chains):
     current_link = choice(chains.keys())
     text += current_link[0] + ' ' + current_link[1]
 
-    while current_link in chains:
+    while True:
         next_word = choice(chains[current_link])
         current_link = (current_link[1], next_word)
 
-        if current_link in chains:
+        if next_word is None:
+            break
+        else:
             text += ' ' + next_word
 
     return text
