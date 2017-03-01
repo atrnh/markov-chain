@@ -54,49 +54,55 @@ def make_chains(text_string, n=2):
 
 
 def make_text(chains):
-    """Takes dictionary of markov chains; returns a random sentence."""
-
-    # Maybe add a way for users to specify amount of sentences they want
+    """Takes dictionary of Markov chains; returns a random sentence."""
 
     ending_punctuation = '.?!'
 
     text = ""
     # Start only on a capital letter
-    current_link = choice([key for key in chains.keys() if key[0][0] == key[0][0].upper()
-                                                           and key[0][0] not in string.punctuation])
-    n = len(current_link) # the length of our n-gram
+    current_link = choice(chains.keys())
+    while (current_link[0][0] != current_link[0][0].upper()
+           and current_link[0][0] in string.punctuation):
+        current_link = choice(chains.keys())
+
+    n = len(current_link)  # the length of our n-gram
     text += ' '.join(current_link)
 
     while True:
         next_word = choice(chains[current_link])
-        next_link = []
+        pending_link = []
 
         # Populate the next link in our chain
-        for incr in range(0, n - 1):
-            next_link.append(current_link[1 + incr])
+        for i in range(0, n - 1):
+            pending_link.append(current_link[1 + i])
 
         if next_word is None:
-            break # There are no more words left
+            break  # End of corpus
         elif next_word[-1] in ending_punctuation:
-            current_link = make_next_link(next_link, next_word)
             text += ' ' + next_word
-            break # The sentence has ended
+            break  # The sentence has ended
         else:
-            current_link = make_next_link(next_link, next_word)
+            current_link = make_next_link(pending_link, next_word)
             text += ' ' + next_word
 
     return text
 
 
 def make_next_link(link, word):
-    """Returns the next link as a tuple."""
+    """Returns the next link as a tuple.
+
+    Takes a Markov chain link as a list and the next word to add as a string.
+    """
 
     link.append(word)
     return tuple(link)
 
 
 def is_under_140(text):
-    """Returns true if text is less than or equal to 140 characters."""
+    """Returns true if text is less than 140 characters.
+
+    Used to check for valid tweet length.
+    """
 
     return len(text) < 140
 
@@ -114,10 +120,10 @@ def make_tweet():
     while True:
         test_tweet = tweet + make_text(chains) + ' '
 
-        if is_under_140(test_tweet):
+        if is_under_140(test_tweet.rstrip()):  # Do not count last space
             tweet = test_tweet
         else:
-            return tweet[:-1]  # Do not include trailing space
+            return tweet.rstrip()  # Do not include trailing space
 
 
 # Produce random text
