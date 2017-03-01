@@ -56,6 +56,8 @@ def make_chains(text_string, n=2):
 def make_text(chains):
     """Takes dictionary of markov chains; returns a random sentence."""
 
+    # Maybe add a way for users to specify amount of sentences they want
+
     ending_punctuation = '.?!'
 
     text = ""
