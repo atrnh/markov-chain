@@ -53,39 +53,50 @@ def make_chains(text_string, n=2):
     return chains
 
 
-def make_text(chains):
+def make_sentence(chains):
     """Takes dictionary of Markov chains; returns a random sentence."""
 
     ending_punctuation = '.?!'
 
-    text = ""
+    sentence = ''
     # Start only on a capital letter
     current_link = choice(chains.keys())
     while (current_link[0][0] != current_link[0][0].upper()
-           and current_link[0][0] in string.punctuation):
+           or current_link[0][0] in string.punctuation):
         current_link = choice(chains.keys())
 
     n = len(current_link)  # the length of our n-gram
-    text += ' '.join(current_link)
+    sentence += ' '.join(current_link)
 
     while True:
         next_word = choice(chains[current_link])
         pending_link = []
 
         # Populate the next link in our chain
-        for i in range(0, n - 1):
+        # We only want n - 1 words in our pending link because the last place
+        # will be occupied by the next word
+        i = 0
+        while len(pending_link) < (n - 1):
             pending_link.append(current_link[1 + i])
+            i += 1
 
         if next_word is None:
             break  # End of corpus
         elif next_word[-1] in ending_punctuation:
-            text += ' ' + next_word
+            sentence += ' ' + next_word
             break  # The sentence has ended
         else:
             current_link = make_next_link(pending_link, next_word)
-            text += ' ' + next_word
+            sentence += ' ' + next_word
 
-    return text
+    return sentence
+
+
+def make_next_sentence(sentence, chains):
+    """Returns a sentence based on the last n-gram of the previous sentence."""
+    n = len(chains.iteritems()[0][0])
+    sentence = sentence.split()
+    current_link = tuple(sentence[(-1 * n):])
 
 
 def make_next_link(link, word):
@@ -118,7 +129,7 @@ def make_tweet():
     tweet = ''
 
     while True:
-        test_tweet = tweet + make_text(chains) + ' '
+        test_tweet = tweet + make_sentence(chains) + ' '
 
         if is_under_140(test_tweet.rstrip()):  # Do not count last space
             tweet = test_tweet
